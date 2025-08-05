@@ -14,14 +14,14 @@ from Templates import css, bot_template, user_template
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
-GOOGLE_API_KEY= os.getenv("GOOGLE_API_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 
 def main():
     st.set_page_config(page_title="Chat with PDFs", page_icon=":books:")
 
-    st.write(css, unsafe_allow_html = True)
-    
+    st.write(css, unsafe_allow_html=True)
+
     st.header("Chat with PDFs")
     user_question = st.text_input("Questions about Document: ")
 
@@ -66,33 +66,37 @@ def get_chunks(text):
 
 def get_vectorstore(textchunks):
     embeddings = OpenAIEmbeddings()
-    #embeddings = HuggingFaceEmbeddings(model_name="hkunlp/instructor-xl")
+    # embeddings = HuggingFaceEmbeddings(model_name="hkunlp/instructor-xl")
     vectorstore = FAISS.from_texts(texts=textchunks, embedding=embeddings)
     return vectorstore
 
 
 def get_conversation_chain(vectorstore):
     my_llm = ChatOpenAI()
-    #my_llm = ChatGoogleGenerativeAI(model="gemini-pro")
-    #my_llm = (SOME HUGGINGFACE LLM)
+    # my_llm = ChatGoogleGenerativeAI(model="gemini-pro")
+    # my_llm = (SOME HUGGINGFACE LLM)
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
-        llm=my_llm, 
-        retriever=vectorstore.as_retriever(), 
-        memory=memory
+        llm=my_llm, retriever=vectorstore.as_retriever(), memory=memory
     )
     return conversation_chain
 
 
 def handle_input_OpenAI(question):
-    response = st.session_state.conversation({'question':question})
+    response = st.session_state.conversation({"question": question})
     st.session_state.chat_history = response["chat_history"]
 
     for i, message in enumerate(st.session_state.chat_history):
         if i % 2 == 0:
-            st.write(user_template.replace("{{MSG}}",message.content), unsafe_allow_html = True)
-        else:  
-            st.write(bot_template.replace("{{MSG}}",message.content), unsafe_allow_html = True)
+            st.write(
+                user_template.replace("{{MSG}}", message.content),
+                unsafe_allow_html=True,
+            )
+        else:
+            st.write(
+                bot_template.replace("{{MSG}}", message.content), unsafe_allow_html=True
+            )
+
 
 if __name__ == "__main__":
     main()
