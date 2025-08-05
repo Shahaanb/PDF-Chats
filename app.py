@@ -31,7 +31,7 @@ def main():
         st.session_state.chat_history = None
 
     if user_question:
-        handle_input(user_question)
+        handle_input_OpenAI(user_question)
 
     with st.sidebar:
         st.subheader("Your Documents: ")
@@ -41,7 +41,6 @@ def main():
                 # Getting Text From PDF
                 text = get_text(documents)
                 chunks = get_chunks(text)
-                st.write(chunks)
                 # Creating Vector Store
                 VectorStore = get_vectorstore(chunks)
 
@@ -75,6 +74,7 @@ def get_vectorstore(textchunks):
 def get_conversation_chain(vectorstore):
     my_llm = ChatOpenAI()
     #my_llm = ChatGoogleGenerativeAI(model="gemini-pro")
+    #my_llm = (SOME HUGGINGFACE LLM)
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
         llm=my_llm, 
@@ -84,7 +84,7 @@ def get_conversation_chain(vectorstore):
     return conversation_chain
 
 
-def handle_input(question):
+def handle_input_OpenAI(question):
     response = st.session_state.conversation({'question':question})
     st.session_state.chat_history = response["chat_history"]
 
