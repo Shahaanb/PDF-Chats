@@ -24,13 +24,14 @@ def main():
     
     st.header("Chat with PDFs")
     user_question = st.text_input("Questions about Document: ")
-    if user_question:
-        st.write(user_template.replace("{{MSG}}",user_question), unsafe_allow_html = True)
-        response = handle_input(user_question)
-        st.write(bot_template.replace("{{MSG}}",response), unsafe_allow_html = True)
 
     if "conversation" not in st.session_state:
         st.session_state.conversation = None
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = None
+
+    if user_question:
+        handle_input(user_question)
 
     with st.sidebar:
         st.subheader("Your Documents: ")
@@ -65,15 +66,15 @@ def get_chunks(text):
 
 
 def get_vectorstore(textchunks):
-    # embeddings = OpenAIEmbeddings()
-    embeddings = HuggingFaceEmbeddings(model_name="hkunlp/instructor-xl")
+    embeddings = OpenAIEmbeddings()
+    #embeddings = HuggingFaceEmbeddings(model_name="hkunlp/instructor-xl")
     vectorstore = FAISS.from_texts(texts=textchunks, embedding=embeddings)
     return vectorstore
 
 
 def get_conversation_chain(vectorstore):
-    #my_llm = ChatOpenAI()
-    my_llm = ChatGoogleGenerativeAI(model="gemini-pro")
+    my_llm = ChatOpenAI()
+    #my_llm = ChatGoogleGenerativeAI(model="gemini-pro")
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
         llm=my_llm, 
@@ -85,7 +86,13 @@ def get_conversation_chain(vectorstore):
 
 def handle_input(question):
     response = st.session_state.conversation({'question':question})
-    return (response)
+    st.session_state.chat_history = response["chat_history"]
+
+    for i, message in enumerate(st.session_state.chat_history):
+        if i % 2 == 0:
+            st.write(user_template.replace("{{MSG}}",message.content), unsafe_allow_html = True)
+        else:  
+            st.write(bot_template.replace("{{MSG}}",message.content), unsafe_allow_html = True)
 
 if __name__ == "__main__":
     main()
