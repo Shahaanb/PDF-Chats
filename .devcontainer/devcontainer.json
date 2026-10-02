@@ -7,6 +7,7 @@
     "8501": { "label": "Streamlit app", "onAutoForward": "openPreview" }
   },
   "secrets": {
-    "OPENAI_API_KEY": { "description": "OpenAI API key used for embeddings and the chat model." }
+    "GOOGLE_API_KEY": { "description": "Google AI Studio key for Gemini (default provider)." },
+    "OPENAI_API_KEY": { "description": "Optional OpenAI API key (set LLM_PROVIDER=openai to use it)." }
   }
 }

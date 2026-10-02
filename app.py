@@ -4,7 +4,7 @@ from langchain_core.chat_history import InMemoryChatMessageHistory
 
 from rag.chain import build_rag_chain, with_memory
 from rag.ingest import build_vectorstore, load_uploaded_pdfs, split_documents
-from rag.providers import get_chat_model, get_embeddings, has_api_key
+from rag.providers import PROVIDERS, chat_model_name, default_provider, get_chat_model, get_embeddings
 from Templates import bot_avatar, user_avatar
 
 load_dotenv()
@@ -19,22 +19,24 @@ def init_state():
 
 
 def process_documents(files):
+    provider = default_provider()
     docs = load_uploaded_pdfs(files)
     chunks = split_documents(docs)
-    vectorstore = build_vectorstore(chunks, get_embeddings())
+    vectorstore = build_vectorstore(chunks, get_embeddings(provider))
     retriever = vectorstore.as_retriever(search_kwargs={"k": TOP_K})
-    st.session_state.chain = with_memory(build_rag_chain(get_chat_model(), retriever),
+    st.session_state.chain = with_memory(build_rag_chain(get_chat_model(provider), retriever),
                                          lambda _session_id: st.session_state.history)
     # A new document set starts a new conversation.
     st.session_state.history = InMemoryChatMessageHistory()
-    st.session_state.doc_stats = {"files": len(files), "pages": len(docs), "chunks": len(chunks)}
+    st.session_state.doc_stats = {"files": len(files), "pages": len(docs), "chunks": len(chunks),
+                                  "model": f"{PROVIDERS[provider]['label']} · {chat_model_name(provider)}"}
 
 
 def sidebar():
     with st.sidebar:
         st.subheader("Your Documents")
         files = st.file_uploader("Upload PDFs, then click Process", type="pdf", accept_multiple_files=True)
-        if st.button("Process", disabled=not files, use_container_width=True):
+        if st.button("Process", disabled=not files or default_provider() is None, use_container_width=True):
             with st.spinner("Reading, chunking and embedding the PDFs..."):
                 try:
                     process_documents(files)
@@ -42,15 +44,16 @@ def sidebar():
                     st.error(f"Could not process the documents: {exc}")
         stats = st.session_state.doc_stats
         if stats:
-            st.success(f"Indexed {stats['files']} file(s): {stats['pages']} pages, {stats['chunks']} chunks.")
+            st.success(f"Indexed {stats['files']} file(s): {stats['pages']} pages, {stats['chunks']} chunks.\n\n"
+                       f"Model: {stats['model']}")
 
 
 def main():
     st.set_page_config(page_title="Chat with PDFs", page_icon=":books:")
     init_state()
     st.header("Chat with PDFs :books:")
-    if not has_api_key():
-        st.error("OPENAI_API_KEY is not set. Add it to a .env file or as a GitHub Codespaces secret.")
+    if default_provider() is None:
+        st.error("No API key found. Set GOOGLE_API_KEY or OPENAI_API_KEY in a .env file or as a GitHub Codespaces secret.")
     sidebar()
 
     for msg in st.session_state.history.messages:
