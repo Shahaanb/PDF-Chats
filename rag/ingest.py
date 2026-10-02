@@ -70,9 +70,10 @@ def make_retriever(vectorstore: FAISS, k: int = TOP_K, search_type: str = "mmr")
     """Retriever over the index.
 
     MMR (maximal marginal relevance) first fetches the 30 closest chunks and then picks k that
-    are relevant but not near-duplicates of each other. In our evaluation this pulled the right
-    passage into the top 6 for questions where plain similarity search returned several
-    overlapping chunks from one page or one paper (see eval/results).
+    are relevant but not near-duplicates of each other. In our evaluation, k = 6 with MMR
+    (instead of the first version's 4 most similar chunks) brought in answer-bearing chunks that
+    had ranked just below the cut-off, at the cost of one vaguer answer (see eval/results and
+    the README).
     """
     search_kwargs = {"k": k}
     if search_type == "mmr":
