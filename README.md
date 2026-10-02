@@ -100,12 +100,17 @@ Full answers, retrieved pages and judge explanations: [final](eval/results/resul
 
 What the evaluation showed:
 * **Follow-ups (Q4, Q6) failed in the baseline.** Q4 retrieved the right page, but the answer step only saw
-  *"How many of them…"* and replied that it could not find it. Q6 missed the one chunk that says *15%*.
-  Passing the rewritten question to the answer step and switching to MMR with k = 6 fixed both.
+  *"How many of them…"* and replied that it could not find it. Q6 missed the one chunk that says *15%*,
+  which ranked 6th. Passing the rewritten question to the answer step fixed Q4; retrieving 6 chunks with
+  MMR instead of 4 fixed Q6, and the extra passages also let Q8 name DPR and BART.
 * **Cross-document question (Q9) still fails.** *"Which of these papers uses BERT inside its own
   architecture?"* retrieves six chunks from the BERT paper because the query says "BERT"; the answer is in the
-  RAG paper ("BERT-base document encoder"). The assistant correctly says it cannot find it rather than
-  guessing.
+  RAG paper ("BERT-base document encoder"), and that chunk is not in the top 30 by similarity, so no k or
+  search type fixes it. The assistant says it cannot find the answer rather than guessing.
+* **MMR is a trade-off.** The automatic check counts Q5 as correct in the final run, but reading it, the
+  answer is only partly right: it names Mask LM and NSP but first says the tasks are "not fully detailed",
+  because MMR swapped out the page 4 chunk that similarity search had found. By our own reading the final run
+  has 9 fully correct answers, 1 partly correct (Q5) and 1 wrong (Q9).
 * **Tables are fragile.** PDF extraction flattens Table 2's `2.3 · 10^19` to `2.3· 1019`. The model read it
   correctly in the last two runs but not in our first run.
 * Gemini output is not fully deterministic, so a question can flip between runs; the results above are single
