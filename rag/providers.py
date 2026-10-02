@@ -49,13 +49,16 @@ def embedding_model_name(provider: str) -> str:
     return os.getenv(var, default)
 
 
-def get_chat_model(provider: str, temperature: float = 0.0) -> BaseChatModel:
+def get_chat_model(provider: str, temperature: float = 0.0, model: str | None = None,
+                   max_retries: int = 2, timeout: float | None = 120) -> BaseChatModel:
+    model = model or chat_model_name(provider)
     if provider == "openai":
         from langchain_openai import ChatOpenAI
-        return ChatOpenAI(model=chat_model_name(provider), temperature=temperature)
+        return ChatOpenAI(model=model, temperature=temperature, max_retries=max_retries, timeout=timeout)
     if provider == "google":
         from langchain_google_genai import ChatGoogleGenerativeAI
-        return ChatGoogleGenerativeAI(model=chat_model_name(provider), temperature=temperature)
+        return ChatGoogleGenerativeAI(model=model, temperature=temperature, max_retries=max_retries,
+                                      timeout=timeout)
     raise ValueError(f"Unknown provider: {provider}")
 
 
