@@ -1,101 +1,77 @@
 import streamlit as st
-import os
-from PyPDF2 import PdfReader
-from langchain.text_splitter import CharacterTextSplitter
-from langchain_community.embeddings import OpenAIEmbeddings
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain.memory import ConversationBufferMemory
-from langchain_community.chat_models import ChatOpenAI
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.chains import ConversationalRetrievalChain
-from Templates import css, bot_template, user_template
+from dotenv import load_dotenv
+from langchain_core.chat_history import InMemoryChatMessageHistory
+
+from rag.chain import build_rag_chain, with_memory
+from rag.ingest import build_vectorstore, load_uploaded_pdfs, split_documents
+from rag.providers import get_chat_model, get_embeddings, has_api_key
+from Templates import bot_avatar, user_avatar
+
+load_dotenv()
+
+TOP_K = 4
 
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+def init_state():
+    st.session_state.setdefault("chain", None)
+    st.session_state.setdefault("history", InMemoryChatMessageHistory())
+    st.session_state.setdefault("doc_stats", None)
+
+
+def process_documents(files):
+    docs = load_uploaded_pdfs(files)
+    chunks = split_documents(docs)
+    vectorstore = build_vectorstore(chunks, get_embeddings())
+    retriever = vectorstore.as_retriever(search_kwargs={"k": TOP_K})
+    st.session_state.chain = with_memory(build_rag_chain(get_chat_model(), retriever),
+                                         lambda _session_id: st.session_state.history)
+    # A new document set starts a new conversation.
+    st.session_state.history = InMemoryChatMessageHistory()
+    st.session_state.doc_stats = {"files": len(files), "pages": len(docs), "chunks": len(chunks)}
+
+
+def sidebar():
+    with st.sidebar:
+        st.subheader("Your Documents")
+        files = st.file_uploader("Upload PDFs, then click Process", type="pdf", accept_multiple_files=True)
+        if st.button("Process", disabled=not files, use_container_width=True):
+            with st.spinner("Reading, chunking and embedding the PDFs..."):
+                try:
+                    process_documents(files)
+                except Exception as exc:  # shown to the user instead of a stack trace
+                    st.error(f"Could not process the documents: {exc}")
+        stats = st.session_state.doc_stats
+        if stats:
+            st.success(f"Indexed {stats['files']} file(s): {stats['pages']} pages, {stats['chunks']} chunks.")
 
 
 def main():
     st.set_page_config(page_title="Chat with PDFs", page_icon=":books:")
+    init_state()
+    st.header("Chat with PDFs :books:")
+    if not has_api_key():
+        st.error("OPENAI_API_KEY is not set. Add it to a .env file or as a GitHub Codespaces secret.")
+    sidebar()
 
-    st.write(css, unsafe_allow_html=True)
+    for msg in st.session_state.history.messages:
+        is_user = msg.type == "human"
+        with st.chat_message("user" if is_user else "assistant", avatar=user_avatar if is_user else bot_avatar):
+            st.markdown(msg.content)
 
-    st.header("Chat with PDFs")
-    user_question = st.text_input("Questions about Document: ")
-
-    if "conversation" not in st.session_state:
-        st.session_state.conversation = None
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = None
-
-    if user_question:
-        handle_input_OpenAI(user_question)
-
-    with st.sidebar:
-        st.subheader("Your Documents: ")
-        documents = st.file_uploader("Upload Your Files", accept_multiple_files=True)
-        if st.button("Process"):
-            with st.spinner("Processing PDF's"):
-                # Getting Text From PDF
-                text = get_text(documents)
-                chunks = get_chunks(text)
-                # Creating Vector Store
-                VectorStore = get_vectorstore(chunks)
-
-                st.session_state.conversation = get_conversation_chain(VectorStore)
-
-
-def get_text(pdf_docs):
-    text = ""
-    for pdf in pdf_docs:
-        pdf_reader = PdfReader(pdf)
-        for page in pdf_reader.pages:
-            text += page.extract_text()
-    return text
-
-
-def get_chunks(text):
-    textSplitter = CharacterTextSplitter(
-        separator="\n", chunk_size=1000, chunk_overlap=200, length_function=len
-    )
-    chunks = textSplitter.split_text(text)
-    return chunks
-
-
-def get_vectorstore(textchunks):
-    embeddings = OpenAIEmbeddings()
-    # embeddings = HuggingFaceEmbeddings(model_name="hkunlp/instructor-xl")
-    vectorstore = FAISS.from_texts(texts=textchunks, embedding=embeddings)
-    return vectorstore
-
-
-def get_conversation_chain(vectorstore):
-    my_llm = ChatOpenAI()
-    # my_llm = ChatGoogleGenerativeAI(model="gemini-pro")
-    # my_llm = (SOME HUGGINGFACE LLM)
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-    conversation_chain = ConversationalRetrievalChain.from_llm(
-        llm=my_llm, retriever=vectorstore.as_retriever(), memory=memory
-    )
-    return conversation_chain
-
-
-def handle_input_OpenAI(question):
-    response = st.session_state.conversation({"question": question})
-    st.session_state.chat_history = response["chat_history"]
-
-    for i, message in enumerate(st.session_state.chat_history):
-        if i % 2 == 0:
-            st.write(
-                user_template.replace("{{MSG}}", message.content),
-                unsafe_allow_html=True,
-            )
-        else:
-            st.write(
-                bot_template.replace("{{MSG}}", message.content), unsafe_allow_html=True
-            )
+    if st.session_state.chain is None:
+        st.info("Upload one or more PDFs in the sidebar and click **Process** to start chatting.")
+    question = st.chat_input("Ask a question about your documents", disabled=st.session_state.chain is None)
+    if question:
+        with st.chat_message("user", avatar=user_avatar):
+            st.markdown(question)
+        with st.chat_message("assistant", avatar=bot_avatar):
+            with st.spinner("Searching the documents..."):
+                try:
+                    result = st.session_state.chain.invoke(
+                        {"question": question}, config={"configurable": {"session_id": "streamlit"}})
+                    st.markdown(result["answer"])
+                except Exception as exc:
+                    st.error(f"The model call failed: {exc}")
 
 
 if __name__ == "__main__":
