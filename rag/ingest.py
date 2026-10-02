@@ -9,10 +9,12 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
+from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
+TOP_K = 6
 
 
 def load_pdf(path: str | Path, display_name: str | None = None) -> list[Document]:
@@ -62,3 +64,17 @@ def build_vectorstore(chunks: list[Document], embeddings: Embeddings) -> FAISS:
     if not chunks:
         raise ValueError("No extractable text was found in the uploaded PDFs (are they scanned images?).")
     return FAISS.from_documents(chunks, embeddings)
+
+
+def make_retriever(vectorstore: FAISS, k: int = TOP_K, search_type: str = "mmr") -> VectorStoreRetriever:
+    """Retriever over the index.
+
+    MMR (maximal marginal relevance) first fetches the 30 closest chunks and then picks k that
+    are relevant but not near-duplicates of each other. In our evaluation this pulled the right
+    passage into the top 6 for questions where plain similarity search returned several
+    overlapping chunks from one page or one paper (see eval/results).
+    """
+    search_kwargs = {"k": k}
+    if search_type == "mmr":
+        search_kwargs.update(fetch_k=max(30, 4 * k), lambda_mult=0.5)
+    return vectorstore.as_retriever(search_type=search_type, search_kwargs=search_kwargs)
