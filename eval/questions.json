@@ -1,0 +1,95 @@
+[
+  {
+    "id": "Q1",
+    "question": "How many layers are in the Transformer's encoder stack?",
+    "category": "Factual lookup",
+    "expected_answer": "N = 6 identical layers",
+    "must_contain": [["6", "six"]],
+    "expected_sources": [["attention_is_all_you_need.pdf", 3]]
+  },
+  {
+    "id": "Q2",
+    "question": "What BLEU score does the big Transformer achieve on the WMT 2014 English-to-German task?",
+    "category": "Numeric fact",
+    "expected_answer": "28.4 BLEU",
+    "must_contain": [["28.4"]],
+    "expected_sources": [["attention_is_all_you_need.pdf", 1], ["attention_is_all_you_need.pdf", 8]]
+  },
+  {
+    "id": "Q3",
+    "question": "What is multi-head attention?",
+    "category": "Concept explanation",
+    "conversation": "heads",
+    "expected_answer": "Several attention functions (heads) run in parallel on different learned projections of queries, keys and values; their outputs are concatenated and projected",
+    "must_contain": [["parallel", "multiple", "several"], ["project"]],
+    "expected_sources": [["attention_is_all_you_need.pdf", 4], ["attention_is_all_you_need.pdf", 5]]
+  },
+  {
+    "id": "Q4",
+    "question": "How many of them does the base model use, and what is the dimension of each?",
+    "category": "Follow-up (memory)",
+    "conversation": "heads",
+    "expected_answer": "h = 8 heads, each with d_k = d_v = 64",
+    "must_contain": [["8", "eight"], ["64"]],
+    "expected_sources": [["attention_is_all_you_need.pdf", 5]]
+  },
+  {
+    "id": "Q5",
+    "question": "What are the two pre-training tasks used by BERT?",
+    "category": "Factual lookup",
+    "conversation": "bert",
+    "expected_answer": "Masked language model (MLM) and next sentence prediction (NSP)",
+    "must_contain": [["mask"], ["next sentence", "nsp"]],
+    "expected_sources": [["bert.pdf", 4], ["bert.pdf", 1], ["bert.pdf", 3]]
+  },
+  {
+    "id": "Q6",
+    "question": "What percentage of tokens does it mask?",
+    "category": "Follow-up (memory)",
+    "conversation": "bert",
+    "expected_answer": "15% of WordPiece tokens (then 80% [MASK], 10% random, 10% unchanged)",
+    "must_contain": [["15%", "15 %", "15 percent"]],
+    "expected_sources": [["bert.pdf", 4], ["bert.pdf", 12], ["bert.pdf", 13]]
+  },
+  {
+    "id": "Q7",
+    "question": "What is the difference between RAG-Sequence and RAG-Token?",
+    "category": "Comparison",
+    "expected_answer": "RAG-Sequence uses the same retrieved document for the whole output; RAG-Token can use a different document for each token",
+    "must_contain": [["same"], ["different", "each token", "each target token"]],
+    "expected_sources": [["rag_lewis_2020.pdf", 2], ["rag_lewis_2020.pdf", 3]]
+  },
+  {
+    "id": "Q8",
+    "question": "What retriever and what generator does the RAG model use?",
+    "category": "Factual lookup",
+    "expected_answer": "DPR (bi-encoder with BERT-base encoders) as retriever, BART-large as generator",
+    "must_contain": [["dpr", "dense passage"], ["bart"]],
+    "expected_sources": [["rag_lewis_2020.pdf", 3], ["rag_lewis_2020.pdf", 1], ["rag_lewis_2020.pdf", 2]]
+  },
+  {
+    "id": "Q9",
+    "question": "Which of these papers uses BERT inside its own architecture, and for what?",
+    "category": "Cross-document",
+    "expected_answer": "The RAG paper: its DPR retriever uses BERT-base query and document encoders",
+    "must_contain": [["rag", "retrieval-augmented"], ["encoder", "retriev", "dpr"]],
+    "expected_sources": [["rag_lewis_2020.pdf", 3]]
+  },
+  {
+    "id": "Q10",
+    "question": "What was the training cost of the big Transformer model in FLOPs?",
+    "category": "Table value",
+    "expected_answer": "2.3 x 10^19 FLOPs (Table 2)",
+    "must_contain": [["2.3"], ["10^19", "10^{19}", "10¹⁹", "e19", "10 19", "x 10^19", "× 10^19"]],
+    "expected_sources": [["attention_is_all_you_need.pdf", 8]]
+  },
+  {
+    "id": "Q11",
+    "question": "What dataset was GPT-3 trained on?",
+    "category": "Out of scope",
+    "expected_answer": "Not in the documents: the assistant should say it could not find this",
+    "expect_not_found": true,
+    "must_contain": [],
+    "expected_sources": []
+  }
+]
