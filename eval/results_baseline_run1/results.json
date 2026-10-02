@@ -1,0 +1,577 @@
+{
+  "meta": {
+    "run_at": "2026-10-02 18:26 UTC",
+    "provider": "google",
+    "chat_model": "gemini-3.5-flash-lite",
+    "embeddings": "local BAAI/bge-small-en-v1.5",
+    "k": 4,
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "documents": [
+      "attention_is_all_you_need.pdf",
+      "bert.pdf",
+      "rag_lewis_2020.pdf"
+    ],
+    "pages": 50,
+    "chunks": 227,
+    "index_seconds": 69.5,
+    "search": "similarity",
+    "answer_step": "raw question",
+    "judge_model": "gemini-3.5-flash-lite (same as chat model)"
+  },
+  "results": [
+    {
+      "id": "Q1",
+      "category": "Factual lookup",
+      "question": "How many layers are in the Transformer's encoder stack?",
+      "conversation": null,
+      "standalone_question": "How many layers are in the Transformer's encoder stack?",
+      "expected_answer": "N = 6 identical layers",
+      "answer": "The encoder is composed of a stack of $N = 6$ identical layers [1].",
+      "retrieved": [
+        [
+          "attention_is_all_you_need.pdf",
+          3
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          5
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          3
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          2
+        ]
+      ],
+      "expected_sources": [
+        [
+          "attention_is_all_you_need.pdf",
+          3
+        ]
+      ],
+      "retrieval_hit": true,
+      "first_hit_rank": 1,
+      "correct": true,
+      "said_not_found": false,
+      "cited_passages": [
+        1
+      ],
+      "has_citation": true,
+      "grounding": {
+        "verdict": "grounded",
+        "unsupported_claims": [],
+        "explanation": "The source passages explicitly state that the encoder is composed of a stack of N = 6 identical layers."
+      },
+      "latency_s": 1.59
+    },
+    {
+      "id": "Q2",
+      "category": "Numeric fact",
+      "question": "What BLEU score does the big Transformer achieve on the WMT 2014 English-to-German task?",
+      "conversation": null,
+      "standalone_question": "What BLEU score does the big Transformer achieve on the WMT 2014 English-to-German task?",
+      "expected_answer": "28.4 BLEU",
+      "answer": "The big Transformer achieves a BLEU score of 28.4 on the WMT 2014 English-to-German translation task [1][3][4].",
+      "retrieved": [
+        [
+          "attention_is_all_you_need.pdf",
+          8
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          8
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          8
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          1
+        ]
+      ],
+      "expected_sources": [
+        [
+          "attention_is_all_you_need.pdf",
+          1
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          8
+        ]
+      ],
+      "retrieval_hit": true,
+      "first_hit_rank": 1,
+      "correct": true,
+      "said_not_found": false,
+      "cited_passages": [
+        1,
+        3,
+        4
+      ],
+      "has_citation": true,
+      "grounding": {
+        "verdict": "grounded",
+        "unsupported_claims": [],
+        "explanation": "The source passages explicitly state that the big Transformer model achieves a BLEU score of 28.4 on the WMT 2014 English-to-German translation task."
+      },
+      "latency_s": 1.43
+    },
+    {
+      "id": "Q3",
+      "category": "Concept explanation",
+      "question": "What is multi-head attention?",
+      "conversation": "heads",
+      "standalone_question": "What is multi-head attention?",
+      "expected_answer": "Several attention functions (heads) run in parallel on different learned projections of queries, keys and values; their outputs are concatenated and projected",
+      "answer": "Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions, which counteracts the reduced effective resolution caused by averaging attention-weighted positions [1][4]. \n\nMathematically, Multi-Head Attention is defined as:\n$$\\text{MultiHead}(Q,K,V) = \\text{Concat}(\\text{head}_1,..., \\text{head}_h)W^O$$\nwhere each head is computed as:\n$$\\text{head}_i = \\text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$$\n\nThe projections are parameter matrices $W_i^Q \\in \\mathbb{R}^{d_{model} \\times d_k}$, $W_i^K \\in \\mathbb{R}^{d_{model} \\times d_k}$, $W_i^V \\in \\mathbb{R}^{d_{model} \\times d_v}$, and $W^O \\in \\mathbb{R}^{h d_v \\times d_{model}}$ [1]. In the described work, $h = 8$ parallel attention layers (or heads) are employed, using $d_k = d_v = d_{model}/h = 64$ [1].",
+      "retrieved": [
+        [
+          "attention_is_all_you_need.pdf",
+          5
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          5
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          4
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          2
+        ]
+      ],
+      "expected_sources": [
+        [
+          "attention_is_all_you_need.pdf",
+          4
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          5
+        ]
+      ],
+      "retrieval_hit": true,
+      "first_hit_rank": 1,
+      "correct": true,
+      "said_not_found": false,
+      "cited_passages": [
+        1,
+        4
+      ],
+      "has_citation": true,
+      "grounding": {
+        "verdict": "grounded",
+        "unsupported_claims": [],
+        "explanation": "All the statements, mathematical formulas, definitions, and specific parameter values provided in the answer are directly supported by the text in the source passages."
+      },
+      "latency_s": 54.17
+    },
+    {
+      "id": "Q4",
+      "category": "Follow-up (memory)",
+      "question": "How many of them does the base model use, and what is the dimension of each?",
+      "conversation": "heads",
+      "standalone_question": "How many attention heads does the Transformer base model use, and what is the dimension of each head?",
+      "expected_answer": "h = 8 heads, each with d_k = d_v = 64",
+      "answer": "I couldn't find this in the uploaded documents.",
+      "retrieved": [
+        [
+          "attention_is_all_you_need.pdf",
+          5
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          5
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          3
+        ],
+        [
+          "bert.pdf",
+          3
+        ]
+      ],
+      "expected_sources": [
+        [
+          "attention_is_all_you_need.pdf",
+          5
+        ]
+      ],
+      "retrieval_hit": true,
+      "first_hit_rank": 1,
+      "correct": false,
+      "said_not_found": true,
+      "cited_passages": [],
+      "has_citation": false,
+      "grounding": {
+        "verdict": "not grounded",
+        "unsupported_claims": [
+          "I couldn't find this in the uploaded documents."
+        ],
+        "explanation": "The source passages do contain the answer: passage [2] states that they employ h = 8 parallel attention layers or heads, and $d_k = d_v = d_{model}/h = 64$ for the dimension of each head."
+      },
+      "latency_s": 40.89
+    },
+    {
+      "id": "Q5",
+      "category": "Factual lookup",
+      "question": "What are the two pre-training tasks used by BERT?",
+      "conversation": "bert",
+      "standalone_question": "What are the two pre-training tasks used by BERT?",
+      "expected_answer": "Masked language model (MLM) and next sentence prediction (NSP)",
+      "answer": "Based on the provided documents, the two pre-training tasks used by BERT are Masked LM (MLM) and Next Sentence Prediction (NSP) [1][2].",
+      "retrieved": [
+        [
+          "bert.pdf",
+          3
+        ],
+        [
+          "bert.pdf",
+          14
+        ],
+        [
+          "bert.pdf",
+          14
+        ],
+        [
+          "bert.pdf",
+          2
+        ]
+      ],
+      "expected_sources": [
+        [
+          "bert.pdf",
+          4
+        ],
+        [
+          "bert.pdf",
+          1
+        ],
+        [
+          "bert.pdf",
+          3
+        ]
+      ],
+      "retrieval_hit": true,
+      "first_hit_rank": 1,
+      "correct": true,
+      "said_not_found": false,
+      "cited_passages": [
+        1,
+        2
+      ],
+      "has_citation": true,
+      "grounding": {
+        "verdict": "grounded",
+        "unsupported_claims": [],
+        "explanation": "The source passages mention 'NSP' and 'Mask LM' under pre-training in Figure 1, which correspond to the two pre-training tasks."
+      },
+      "latency_s": 3.18
+    },
+    {
+      "id": "Q6",
+      "category": "Follow-up (memory)",
+      "question": "What percentage of tokens does it mask?",
+      "conversation": "bert",
+      "standalone_question": "What percentage of tokens does BERT mask during its pre-training?",
+      "expected_answer": "15% of WordPiece tokens (then 80% [MASK], 10% random, 10% unchanged)",
+      "answer": "I couldn't find this in the uploaded documents.",
+      "retrieved": [
+        [
+          "bert.pdf",
+          12
+        ],
+        [
+          "bert.pdf",
+          3
+        ],
+        [
+          "bert.pdf",
+          16
+        ],
+        [
+          "bert.pdf",
+          5
+        ]
+      ],
+      "expected_sources": [
+        [
+          "bert.pdf",
+          4
+        ],
+        [
+          "bert.pdf",
+          12
+        ],
+        [
+          "bert.pdf",
+          13
+        ]
+      ],
+      "retrieval_hit": true,
+      "first_hit_rank": 1,
+      "correct": false,
+      "said_not_found": true,
+      "cited_passages": [],
+      "has_citation": false,
+      "grounding": {
+        "verdict": "not grounded",
+        "unsupported_claims": [
+          "I couldn't find this in the uploaded documents."
+        ],
+        "explanation": "The provided source passages do not mention the percentage of tokens BERT masks during pre-training."
+      },
+      "latency_s": 7.45
+    },
+    {
+      "id": "Q7",
+      "category": "Comparison",
+      "question": "What is the difference between RAG-Sequence and RAG-Token?",
+      "conversation": null,
+      "standalone_question": "What is the difference between RAG-Sequence and RAG-Token?",
+      "expected_answer": "RAG-Sequence uses the same retrieved document for the whole output; RAG-Token can use a different document for each token",
+      "answer": "The difference between the two models lies in how they handle retrieved documents to produce the distribution over generated text:\n\n* **RAG-Sequence Model:** This model uses the same retrieved document to generate the complete target sequence [2]. It treats the retrieved document as a single latent variable that is marginalized to obtain the seq2seq probability $p(y|x)$ via a top-K approximation [2].\n* **RAG-Token Model:** This model can predict each target token based on a different retrieved document [2].",
+      "retrieved": [
+        [
+          "rag_lewis_2020.pdf",
+          6
+        ],
+        [
+          "rag_lewis_2020.pdf",
+          3
+        ],
+        [
+          "rag_lewis_2020.pdf",
+          2
+        ],
+        [
+          "rag_lewis_2020.pdf",
+          6
+        ]
+      ],
+      "expected_sources": [
+        [
+          "rag_lewis_2020.pdf",
+          2
+        ],
+        [
+          "rag_lewis_2020.pdf",
+          3
+        ]
+      ],
+      "retrieval_hit": true,
+      "first_hit_rank": 2,
+      "correct": true,
+      "said_not_found": false,
+      "cited_passages": [
+        2
+      ],
+      "has_citation": true,
+      "grounding": {
+        "verdict": "grounded",
+        "unsupported_claims": [],
+        "explanation": "The assistant's explanation of the differences between RAG-Sequence and RAG-Token is directly supported by the text in source [2]."
+      },
+      "latency_s": 4.37
+    },
+    {
+      "id": "Q8",
+      "category": "Factual lookup",
+      "question": "What retriever and what generator does the RAG model use?",
+      "conversation": null,
+      "standalone_question": "What retriever and what generator does the RAG model use?",
+      "expected_answer": "DPR (bi-encoder with BERT-base encoders) as retriever, BART-large as generator",
+      "answer": "Based on the provided document, the RAG model leverages two components:\n1. A retriever $p_\\eta(z|x)$ with parameters $\\eta$ that returns (top-K truncated) distributions over text passages given a query $x$ [1].\n2. A generator parametrized by $\\theta$ (denoted as $p_\\theta(y_i | x, z, y_{1:i-1})$) that generates a current token based on a context of the previous $i-1$ tokens $y_{1:i-1}$, the original input $x$, and a retrieved passage $z$ [1][2].",
+      "retrieved": [
+        [
+          "rag_lewis_2020.pdf",
+          2
+        ],
+        [
+          "rag_lewis_2020.pdf",
+          3
+        ],
+        [
+          "rag_lewis_2020.pdf",
+          7
+        ],
+        [
+          "rag_lewis_2020.pdf",
+          9
+        ]
+      ],
+      "expected_sources": [
+        [
+          "rag_lewis_2020.pdf",
+          3
+        ],
+        [
+          "rag_lewis_2020.pdf",
+          1
+        ],
+        [
+          "rag_lewis_2020.pdf",
+          2
+        ]
+      ],
+      "retrieval_hit": true,
+      "first_hit_rank": 1,
+      "correct": false,
+      "said_not_found": false,
+      "cited_passages": [
+        1,
+        2
+      ],
+      "has_citation": true,
+      "grounding": {
+        "verdict": "grounded",
+        "unsupported_claims": [],
+        "explanation": "The answer accurately describes the retriever and generator components of the RAG model using the exact definitions and mathematical notations provided in the source passages."
+      },
+      "latency_s": 2.31
+    },
+    {
+      "id": "Q9",
+      "category": "Cross-document",
+      "question": "Which of these papers uses BERT inside its own architecture, and for what?",
+      "conversation": null,
+      "standalone_question": "Which of these papers uses BERT inside its own architecture, and for what?",
+      "expected_answer": "The RAG paper: its DPR retriever uses BERT-base query and document encoders",
+      "answer": "I couldn't find this in the uploaded documents.",
+      "retrieved": [
+        [
+          "bert.pdf",
+          14
+        ],
+        [
+          "bert.pdf",
+          9
+        ],
+        [
+          "bert.pdf",
+          2
+        ],
+        [
+          "bert.pdf",
+          1
+        ]
+      ],
+      "expected_sources": [
+        [
+          "rag_lewis_2020.pdf",
+          3
+        ]
+      ],
+      "retrieval_hit": false,
+      "first_hit_rank": null,
+      "correct": false,
+      "said_not_found": true,
+      "cited_passages": [],
+      "has_citation": false,
+      "grounding": {
+        "verdict": "grounded",
+        "unsupported_claims": [],
+        "explanation": "The provided source passages discuss BERT and its pre-training/fine-tuning capabilities, but they do not mention any specific papers using BERT inside their own architecture. Therefore, stating that the information could not be found is correct."
+      },
+      "latency_s": 3.24
+    },
+    {
+      "id": "Q10",
+      "category": "Table value",
+      "question": "What was the training cost of the big Transformer model in FLOPs?",
+      "conversation": null,
+      "standalone_question": "What was the training cost of the big Transformer model in FLOPs?",
+      "expected_answer": "2.3 x 10^19 FLOPs (Table 2)",
+      "answer": "Based on the provided document, the training cost (in FLOPs) for the Transformer (big) model is not explicitly listed in Table 2 for English-to-French, but Table 2 lists the English-to-German and English-to-French training costs for the \"Transformer (base model)\" as $3.3 \\cdot 10^{18}$ [1]. \n\nFor the English-to-French task specifically, the document states that the big model achieves its results \"at less than 1/4 the training cost of the previous state-of-the-art model\" [3], but it does not state the exact FLOPs value for the Transformer (big) model in the text or tables. \n\nI couldn't find this specific FLOPs value for the big Transformer model in the uploaded documents.",
+      "retrieved": [
+        [
+          "attention_is_all_you_need.pdf",
+          8
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          8
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          8
+        ],
+        [
+          "attention_is_all_you_need.pdf",
+          8
+        ]
+      ],
+      "expected_sources": [
+        [
+          "attention_is_all_you_need.pdf",
+          8
+        ]
+      ],
+      "retrieval_hit": true,
+      "first_hit_rank": 1,
+      "correct": false,
+      "said_not_found": false,
+      "cited_passages": [
+        1,
+        3
+      ],
+      "has_citation": true,
+      "grounding": {
+        "verdict": "not grounded",
+        "unsupported_claims": [
+          "the training cost (in FLOPs) for the Transformer (big) model is not explicitly listed in Table 2 for English-to-French",
+          "I couldn't find this specific FLOPs value for the big Transformer model in the uploaded documents."
+        ],
+        "explanation": "Table 2 explicitly lists the training cost in FLOPs for the Transformer (big) model as 2.3 × 10^19 (shown in the row for Transformer (big) under the EN-DE column, which applies to the model's training cost as summarized in the table). Therefore, the assistant's claim that the value is not in the document is incorrect."
+      },
+      "latency_s": 1.63
+    },
+    {
+      "id": "Q11",
+      "category": "Out of scope",
+      "question": "What dataset was GPT-3 trained on?",
+      "conversation": null,
+      "standalone_question": "What dataset was GPT-3 trained on?",
+      "expected_answer": "Not in the documents: the assistant should say it could not find this",
+      "answer": "I couldn't find this in the uploaded documents.",
+      "retrieved": [
+        [
+          "bert.pdf",
+          15
+        ],
+        [
+          "bert.pdf",
+          6
+        ],
+        [
+          "bert.pdf",
+          13
+        ],
+        [
+          "bert.pdf",
+          14
+        ]
+      ],
+      "expected_sources": [],
+      "retrieval_hit": null,
+      "first_hit_rank": null,
+      "correct": true,
+      "said_not_found": true,
+      "cited_passages": [],
+      "has_citation": false,
+      "grounding": {
+        "verdict": "grounded",
+        "unsupported_claims": [],
+        "explanation": "The provided source passages mention OpenAI GPT and discuss its training on a large text corpus, but they do not contain information specifically about GPT-3 and the dataset it was trained on."
+      },
+      "latency_s": 2.04
+    }
+  ]
+}
