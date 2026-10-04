@@ -66,6 +66,26 @@ streamlit run app.py
 The first **Process** downloads the embedding model (about 65 MB) once; indexing the three sample papers
 (50 pages, 227 chunks) takes about 70 s on a 2-core Codespace.
 
+![The interface after indexing the three sample papers, with a question and a follow-up](docs/screenshots/interface.png)
+
+The sidebar holds the uploader, the settings, the Process and sample-paper buttons, the index statistics and
+**Clear chat**. Each answer cites its passages as `[n]`; a follow-up also shows the rewritten question it was
+searched with (*Searched for: …*), and **Sources** lists the retrieved passages with file and page.
+
+## Sample inputs and outputs
+
+Answers from the final evaluation run, word for word (LaTeX shown as plain text). Questions in the same group
+were asked in one conversation, so the follow-ups rely on memory.
+
+| Input | Output | Source of the cited passage |
+|---|---|---|
+| How many layers are in the Transformer's encoder stack? | "The encoder is composed of a stack of N = 6 identical layers [1]." | Attention, p. 3 |
+| What is multi-head attention? → **How many of them does the base model use, and what is the dimension of each?** | "The Transformer base model uses h = 8 parallel attention heads [1, 2]. The dimension of each head is d_k = d_v = 64 (which corresponds to d_model / h, where d_model = 512) [1, 2]." | Attention, p. 5 |
+| What are the two pre-training tasks used by BERT? → **What percentage of tokens does it mask?** | "During BERT pre-training, the training data generator chooses **15%** of the token positions at random for prediction [5]." | BERT, p. 4 |
+| What was the training cost of the big Transformer model in FLOPs? | "Based on Table 2, the training cost for the Transformer (big) model is 2.3 · 10^19 FLOPs for English-to-German (EN-DE) [1]." | Attention, p. 8 (Table 2) |
+| What dataset was GPT-3 trained on? *(out of scope)* | "I couldn't find this in the uploaded documents." | none (correct refusal) |
+| Which of these papers uses BERT inside its own architecture, and for what? *(known failure)* | "I couldn't find this in the uploaded documents." | none; the answer is on RAG p. 3, but all six retrieved passages came from the BERT paper |
+
 ## Configuration
 
 | Variable | Default | Purpose |
